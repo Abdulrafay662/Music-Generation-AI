@@ -16,4 +16,4 @@ An intelligent music sequence generation web application built using Python, Fla
 ## 💻 How to Run Locally
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/Abdulrafay662/Music-Generation-AI.git](https://github.com/Abdulrafay662/Music-Generation-AI.git)
+   git clone (https://github.com/Abdulrafay662/Music-Generation-AI.git)
