@@ -3,33 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Music Generator - CodeAlpha</title>
+    <title>AI Music Sequence Generator | CodeAlpha Task 3</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; text-align: center; padding: 50px; }
-        .container { max-width: 600px; margin: auto; background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        h1 { color: #38bdf8; }
-        button { background-color: #38bdf8; color: #0f172a; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        button:hover { background-color: #0ea5e9; }
-        .output-box { margin-top: 25px; padding: 15px; background: #0f172a; border-radius: 6px; font-family: monospace; font-size: 18px; color: #4ade80; min-height: 40px; word-break: break-all; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: rgba(56, 189, 248, 0.1);
+            color: var(--accent-color);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .output-container {
+            margin-top: 35px;
+            text-align: left;
+        }
+
+        .output-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .output-box {
+            background: var(--bg-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+            color: var(--success-color);
+            min-height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-all;
+            transition: all 0.3s ease;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>🎵 AI Music Generator</h1>
-        <p>Click the button below to generate a new sequence of AI musical notes using an LSTM Neural Network.</p>
-        <button onclick="generateMusic()">Generate Music Notes</button>
-        <div class="output-box" id="result">Click generate to start...</div>
+        <span class="badge">CodeAlpha AI Internship Track</span>
+        <h1>🎵 AI Music Sequence Generator</h1>
+        <p>Powered by an LSTM Deep Learning neural network. Click the button below to query the backend model and synthesize a brand-new sequence of musical notes.</p>
+        
+        <button class="btn" id="generateBtn" onclick="generateMusic()">Generate New Notes</button>
+
+        <div class="output-container">
+            <span class="output-label">Model Output Sequence:</span>
+            <div class="output-box" id="result">Click generate to start the model...</div>
+        </div>
+
+        <div class="footer">
+            Task 3: Music Generation with AI
+        </div>
     </div>
 
     <script>
         async function generateMusic() {
-            document.getElementById("result").innerText = "Generating notes...";
+            const resultBox = document.getElementById("result");
+            const btn = document.getElementById("generateBtn");
+            
+            // Update UI state to loading
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+            resultBox.style.color = "var(--accent-color)";
+            resultBox.innerText = "Synthesizing note sequence...";
+
             try {
                 let response = await fetch('/generate');
+                if (!response.ok) {
+                    throw new Error("Server communication failed.");
+                }
                 let data = await response.json();
-                document.getElementById("result").innerText = "Generated Sequence: [" + data.notes.join(", ") + "]";
+                
+                // Success styling and output formatting
+                resultBox.style.color = "var(--success-color)";
+                resultBox.innerText = "[" + data.notes.join(", ") + "]";
             } catch (error) {
-                document.getElementById("result").innerText = "Error generating music.";
+                // Error handling
+                resultBox.style.color = "var(--error-color)";
+                resultBox.innerText = "Error: Could not fetch data from Flask server.";
+            } finally {
+                // Reset button state
+                btn.disabled = false;
+                btn.style.opacity = "1";
             }
         }
     </script>
